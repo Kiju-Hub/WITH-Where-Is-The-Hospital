@@ -65,7 +65,6 @@
             flex: 1;
         }
 
-        /* 공통 버튼 스타일 */
         button {
             border-radius: 25px;
             padding: 12px 25px;
@@ -75,35 +74,29 @@
             transition: 0.2s;
         }
 
-        /* 병원 버튼 */
         #myLocationBtn {
             border: 2px solid #44b44a;
             color: #2e7d32;
         }
-        #myLocationBtn:hover,
-        #myLocationBtn.active {
+        #myLocationBtn:hover, #myLocationBtn.active {
             background: #44b44a;
             color: white;
         }
 
-        /* 응급실 버튼 */
         #emergencyBtn {
             border: 2px solid #D32F2F;
             color: #b71c1c;
         }
-        #emergencyBtn:hover,
-        #emergencyBtn.active {
+        #emergencyBtn:hover, #emergencyBtn.active {
             background: #D32F2F;
             color: white;
         }
 
-        /* 약국 버튼 */
         #pharmacyBtn {
             border: 2px solid #fa8253;
             color: #d35c2d;
         }
-        #pharmacyBtn:hover,
-        #pharmacyBtn.active {
+        #pharmacyBtn:hover, #pharmacyBtn.active {
             background: #fa8253;
             color: white;
         }
@@ -159,7 +152,7 @@
             background: #f8fff8;
         }
 
-        /* --- 챗봇 스타일 추가 --- */
+        /* 챗봇 스타일 */
         #chat-container {
             position: fixed;
             bottom: 20px;
@@ -175,6 +168,7 @@
             overflow: hidden;
             border: 1px solid #ddd;
         }
+
         #chat-header {
             background: #007bff;
             color: white;
@@ -184,6 +178,7 @@
             justify-content: space-between;
             align-items: center;
         }
+
         #chat-messages {
             flex: 1;
             padding: 15px;
@@ -191,16 +186,54 @@
             background: #f8f9fa;
             font-size: 14px;
         }
-        .msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; max-width: 80%; }
-        .user-msg { background: #007bff; color: white; margin-left: auto; text-align: right; }
-        .bot-msg { background: #e9ecef; color: black; margin-right: auto; }
-        
+
+        /* 공통 말풍선 */
+        .msg { 
+            margin-bottom: 10px; 
+            padding: 10px 14px; 
+            border-radius: 12px; 
+            max-width: 80%;
+            word-break: break-word;
+        }
+
+        /* 사용자 메시지 행 (오른쪽 정렬) */
+        .user-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        /* 사용자 말풍선 */
+        .user-msg {
+            background: #007bff;
+            color: white;
+            text-align: right;
+            border-radius: 12px;
+        }
+
+        /* 봇 메시지 행 (왼쪽 정렬 + 프로필 포함) */
+        .bot-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        /* 봇 프로필 이미지 */
+        .bot-profile {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
         #chat-input-area {
             padding: 10px;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #eeeeee;
             display: flex;
             gap: 5px;
         }
+
         #chat-btn {
             position: fixed;
             bottom: 20px;
@@ -263,12 +296,24 @@
         <span>WITH AI 의료상담</span>
         <button onclick="toggleChat()" style="background:none;border:none;color:white;cursor:pointer;">✕</button>
     </div>
+
     <div id="chat-messages">
-        <div class="msg bot-msg">안녕하세요! 어디가 불편하신가요? 증상을 말씀해주시면 진료과를 추천해드릴게요.</div>
+        <div class="bot-row">
+            <img src="/static/doctor.png" class="bot-profile">
+            <div class="msg bot-msg">안녕하세요! 어디가 불편하신가요? 증상을 말씀해주시면 진료과를 추천해드릴게요.</div>
+
+        </div>
     </div>
+
     <div id="chat-input-area">
-        <input type="text" id="user-input" placeholder="예: 배가 너무 아파요..." style="flex:1; padding:8px;" onkeypress="if(event.keyCode==13) sendMessage()">
-        <button onclick="sendMessage()" style="padding:8px 15px; background:#007bff; color:white; border:none; border-radius:4px;">전송</button>
+        <input type="text" id="user-input" placeholder="예: 배가 너무 아파요..." 
+               style="flex:1; padding:8px;" 
+               onkeypress="if(event.keyCode==13) sendMessage()">
+
+        <button onclick="sendMessage()" 
+                style="padding:8px 15px; background:#007bff; color:white; border:none; border-radius:4px;">
+            전송
+        </button>
     </div>
 </div>
 
@@ -276,10 +321,9 @@
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 <script>
-    /* 기존 버튼 스타일 로직 */
+    /* 버튼 상태 */
     function setActiveButton(id) {
         const ids = ["myLocationBtn", "emergencyBtn", "pharmacyBtn"];
-
         ids.forEach(btn => {
             const el = document.getElementById(btn);
             if (btn === id) el.classList.add("active");
@@ -287,17 +331,7 @@
         });
     }
 
-    document.getElementById("myLocationBtn").addEventListener("click", () => {
-        setActiveButton("myLocationBtn");
-    });
-    document.getElementById("emergencyBtn").addEventListener("click", () => {
-        setActiveButton("emergencyBtn");
-    });
-    document.getElementById("pharmacyBtn").addEventListener("click", () => {
-        setActiveButton("pharmacyBtn");
-    });
-
-    /* --- 챗봇 JS 로직 --- */
+    /* 챗봇 열기/닫기 */
     function toggleChat() {
         const box = document.getElementById('chat-container');
         const btn = document.getElementById('chat-btn');
@@ -310,55 +344,88 @@
         }
     }
 
-    async function sendMessage() {
-        const input = document.getElementById('user-input');
-        const msg = input.value.trim();
-        if (!msg) return;
+    /* 메시지 전송 */
+    /* 메시지 전송 */
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const msg = input.value.trim();
+        if (!msg) return;
 
-        // 사용자 메시지 표시
-        addMessage(msg, 'user-msg');
-        input.value = '';
+        addMessage(msg, 'user-msg');
+        input.value = '';
 
-        // 로딩 표시
-        const loadingId = addMessage('...', 'bot-msg');
+        // 로딩 메시지 띄우기 (여기서 로딩바의 ID를 받아옵니다)
+        const loadingRowId = addMessage('...', 'bot-msg');
 
-        try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: msg })
-            });
-            const data = await response.json();
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+            });
+            const data = await response.json();
+
+            // [중요] 로딩바 전체(아이콘 포함)를 삭제합니다
+            const loadingRow = document.getElementById(loadingRowId);
+            if (loadingRow) {
+                loadingRow.remove();
+            }
+
+            if (data.reply) addMessage(data.reply, 'bot-msg');
+            else addMessage("죄송합니다. 오류가 발생했습니다.", 'bot-msg');
+
+        } catch (err) {
+            console.error(err);
+            // 에러 발생 시에도 로딩바 삭제
+            const loadingRow = document.getElementById(loadingRowId);
+            if (loadingRow) loadingRow.remove();
+            
+            addMessage("서버 연결 실패", 'bot-msg');
+        }
+    }
+
+    /* 메시지 추가 함수 (수정됨) */
+    function addMessage(text, className) {
+        const messagesBox = document.getElementById('chat-messages');
+        const id = 'msg-' + Date.now();
+
+        if (className === 'bot-msg') {
+            const row = document.createElement('div');
+            row.className = 'bot-row';
+            row.id = 'row-' + id; // [중요] 줄 전체에 ID를 부여합니다
+
+            const img = document.createElement('img');
+            img.src = '/static/doctor.png';
+            img.className = 'bot-profile';
+
+            const bubble = document.createElement('div');
+            bubble.className = `msg bot-msg`;
+            bubble.innerText = text;
+
+            row.appendChild(img);
+            row.appendChild(bubble);
+            messagesBox.appendChild(row);
+
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+            return 'row-' + id; // 줄 전체의 ID를 반환
+
+        } else {
+            // 사용자 메시지 처리 (기존 유지)
+            // 사용자 메시지용 row 컨테이너를 추가하여 디자인 통일성을 높입니다.
+            const row = document.createElement('div');
+            row.className = 'user-row'; // CSS에 있는 .user-row 사용
+
+            const bubble = document.createElement('div');
+            bubble.className = `msg user-msg`;
+            bubble.innerText = text;
             
-            // 로딩 메시지 삭제 후 응답 표시
-            document.getElementById(loadingId).remove();
-            
-            if (data.reply) {
-                addMessage(data.reply, 'bot-msg');
-            } else {
-                addMessage("죄송합니다. 오류가 발생했습니다.", 'bot-msg');
-            }
-        } catch (err) {
-            console.error(err);
-            document.getElementById(loadingId).remove();
-            addMessage("서버 연결 실패 ㅠㅠ", 'bot-msg');
-        }
-    }
-
-    function addMessage(text, className) {
-        const div = document.createElement('div');
-        const id = 'msg-' + Date.now();
-        div.id = id;
-        div.className = `msg ${className}`;
-        div.innerText = text;
-        document.getElementById('chat-messages').appendChild(div);
-        
-        // 스크롤 맨 아래로
-        const chatBox = document.getElementById('chat-messages');
-        chatBox.scrollTop = chatBox.scrollHeight;
-        
-        return id;
-    }
+            row.appendChild(bubble);
+            messagesBox.appendChild(row);
+            
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+            return null;
+        }
+    }
 </script>
 
 </body>
