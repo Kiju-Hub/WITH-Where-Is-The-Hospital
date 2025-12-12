@@ -1,15 +1,17 @@
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 import csv
 import os
 import math
 import requests
 import xmltodict
+import pymysql
 from dotenv import load_dotenv
 from datetime import datetime
 from openai import OpenAI
 from urllib.parse import unquote
-
+pymysql.install_as_MySQLdb()
 # ================================
 # 초기 설정
 # ================================
@@ -94,6 +96,9 @@ def format_all_pharmacy_hours(item):
          return "" 
          
     return " | ".join(formatted_hours)
+
+
+
 
 # 약국 영업시간 판별 [수정됨]
 def is_pharmacy_open(item):
