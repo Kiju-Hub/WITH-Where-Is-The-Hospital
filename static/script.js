@@ -112,8 +112,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 await loadHospitals(lat, lon, keyword, radius);
                 setActiveButton("myLocationBtn");
             }
+            statusMsg.innerText = "";
             
-            statusMsg.innerText = "✅ 완료!";
+            Swal.fire({
+                icon: 'success',             // 아이콘 (success, error, warning, info, question)
+                title: '검색 완료!',         // 제목
+                text: '주변 의료기관을 모두 찾았습니다.', // 설명
+                showConfirmButton: false,    // '확인' 버튼 숨기기 (깔끔하게)
+                timer: 1700                  // 1.5초 뒤에 자동으로 사라짐 (딱 좋음)
+            });
             
         }, (err) => {
             console.error(err);

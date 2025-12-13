@@ -116,6 +116,7 @@ def home():
 # ================================
 # [API] 병원 검색 (최종 정상화 버전)
 # ================================
+# [app.py] - get_hospitals 함수 부분만 교체
 @app.route("/api/hospitals")
 def get_hospitals():
     user_lat = request.args.get("lat", type=float)
@@ -131,54 +132,41 @@ def get_hospitals():
 
     try:
         with conn.cursor() as cur:
-            # 1. 내 주변에서 가장 가까운 병원 1개를 먼저 찾아봅니다 (거리 무제한)
-            # 데이터가 시흥 근처에 아예 없는지 확인하기 위함입니다.
-            check_sql = """
-            SELECT name, y_pos, x_pos,
-                (6371 * acos(cos(radians(%s)) * cos(radians(y_pos)) * cos(radians(x_pos) - radians(%s)) + sin(radians(%s)) * sin(radians(y_pos)))) AS dist
-            FROM hospitals
-            WHERE name LIKE %s
-            ORDER BY dist ASC
-            LIMIT 1
-            """
-            cur.execute(check_sql, (user_lat, user_lon, user_lat, f"%{keyword}%"))
-            closest = cur.fetchone()
-            
-            if closest:
-                print(f"👀 [진단] 가장 가까운 병원: {closest['name']} (거리: {round(closest['dist'], 2)}km)")
-            else:
-                print(f"⚠️ [진단] '{keyword}' 검색 결과가 DB 전체에 없습니다.")
-
-            # 2. 실제 반경 내 검색 (정석 로직: y_pos=위도, x_pos=경도)
+            # 쿼리: 이름(name) OR 진료과목(departments) 검색
             sql = """
             SELECT 
                 name, 
+                departments,   -- 결과 화면에 보여주면 좋음
                 addr AS address, 
                 tel_no AS phone, 
-                y_pos AS lat,   -- y_pos는 위도(Latitude)
-                x_pos AS lng,   -- x_pos는 경도(Longitude)
-                (
-                    6371 * acos(
-                        LEAST(1.0, GREATEST(-1.0, 
-                            cos(radians(%s)) * cos(radians(y_pos)) * cos(radians(x_pos) - radians(%s)) + 
-                            sin(radians(%s)) * sin(radians(y_pos))
-                        ))
-                    )
+                y_pos AS lat,
+                x_pos AS lng,
+                ROUND(
+                    (
+                        6371 * acos(
+                            LEAST(1.0, GREATEST(-1.0, 
+                                cos(radians(%s)) * cos(radians(y_pos)) * cos(radians(x_pos) - radians(%s)) + 
+                                sin(radians(%s)) * sin(radians(y_pos))
+                            ))
+                        )
+                    ), 2
                 ) AS distance
             FROM hospitals
-            WHERE name LIKE %s
+            WHERE (name LIKE %s OR departments LIKE %s)
             HAVING distance <= %s
             ORDER BY distance
             LIMIT 50
             """
             
+            # 검색어를 두 번 넣어줍니다 (이름용, 진료과목용)
+            search_pattern = f"%{keyword}%"
             cur.execute(sql, (
                 user_lat, user_lon, user_lat, 
-                f"%{keyword}%", 
+                search_pattern, search_pattern, 
                 radius_km
             ))
             result = cur.fetchall()
-            print(f"🔍 최종 결과 반환 수: {len(result)}개")
+            print(f"🔍 검색어: '{keyword}', 결과 수: {len(result)}개")
 
     except Exception as e:
         print(f"❌ 에러 발생: {e}")
