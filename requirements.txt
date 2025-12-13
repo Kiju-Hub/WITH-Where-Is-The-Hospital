@@ -5,3 +5,4 @@ xmltodict
 python-dotenv
 openai
 gunicorn
+pymysql
