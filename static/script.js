@@ -308,17 +308,6 @@ document.addEventListener("DOMContentLoaded", function() {
             let icon = "🏥";
             let statusBadge = "";
 
-            if (type === 'pharmacy') {
-                icon = "💊";
-                // 약국은 영업 상태(status)가 있음
-                if (h.status === "영업중") {
-                    statusBadge = `<span style="color:#2E7D32; font-weight:bold; font-size:0.8em; margin-left:5px;">[영업중]</span>`;
-                } else if (h.status === "영업종료") {
-                    statusBadge = `<span style="color:#D32F2F; font-weight:bold; font-size:0.8em; margin-left:5px;">[영업종료]</span>`;
-                } else {
-                    statusBadge = `<span style="color:#757575; font-size:0.8em; margin-left:5px;">[${h.status || '확인불가'}]</span>`;
-                }
-            }
 
             item.innerHTML = `
                 <div style="font-weight:bold; font-size:1.1em; margin-bottom:5px;">
@@ -344,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // E. 응급실 리스트 렌더링
+    // E. 응급실 리스트 렌더링 (수정됨: 상세정보 버튼 추가)
     function renderEmergencyList(list) {
         const listDiv = document.getElementById("hospital-list");
         listDiv.innerHTML = "";
@@ -366,13 +355,29 @@ document.addEventListener("DOMContentLoaded", function() {
                 <div style="font-size:0.85em; margin-top:5px;">
                     거리: <strong>${h.distance}km</strong>
                 </div>
-                <div style="margin-top:10px; font-size:0.9em;">
-                    <a href="tel:${h.phone}" style="text-decoration:none; color:#333; background:#eee; padding:5px 10px; border-radius:5px;">
-                        📞 전화 걸기 (${h.phone})
+                
+                <div style="margin-top:10px; display:flex; gap:5px;">
+                    <a href="tel:${h.phone}" style="flex:1; text-align:center; text-decoration:none; color:#333; background:#f1f1f1; padding:8px; border-radius:4px; font-size:0.9em; font-weight:bold;">
+                        📞 전화
                     </a>
+                    <button class="detail-btn" style="flex:1; background:#FAE100; color:#3b1e1e; border:none; padding:8px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.9em;">
+                        카카오맵 >
+                    </button>
                 </div>
             `;
-            item.onclick = () => selectLocation(index, h.lat, h.lng, true);
+            
+            // 리스트 아이템 클릭 시 지도 이동 (버튼 클릭 제외)
+            item.onclick = (e) => {
+                // 전화 버튼(A태그)이나 상세버튼(BUTTON) 누르면 지도 이동 안 함
+                if (e.target.tagName === 'BUTTON' || e.target.closest('a')) return;
+                selectLocation(index, h.lat, h.lng, true);
+            };
+
+            // 상세정보 버튼 클릭 이벤트 연결
+            item.querySelector(".detail-btn").onclick = () => {
+                findAndOpenDetail(h.name, h.lat, h.lng);
+            };
+
             listDiv.appendChild(item);
         });
     }
