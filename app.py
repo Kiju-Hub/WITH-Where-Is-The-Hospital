@@ -75,7 +75,7 @@ def safe_float(val):
         return None
 
 # ================================
-# STAGE1 후보 자동 선정 (기존 로직 유지)
+# STAGE1 후보 자동 선정
 # ================================
 def pick_stage1_candidates(lat, lon):
     candidates = set()
@@ -107,16 +107,6 @@ def home():
 # ================================
 # [API] 병원 검색 (CSV ❌ → MySQL ✅)
 # ================================
-# ================================
-# [API] 병원 검색 (한글 DB 컬럼 대응 버전)
-# ================================
-# ================================
-# [API] 병원 검색 (영어 DB 컬럼 버전 - 최종)
-# ================================
-# ================================
-# [API] 병원 검색 (최종 정상화 버전)
-# ================================
-# [app.py] - get_hospitals 함수 부분만 교체
 @app.route("/api/hospitals")
 def get_hospitals():
     user_lat = request.args.get("lat", type=float)
@@ -178,7 +168,7 @@ def get_hospitals():
     return jsonify(result)
 
 # ================================
-# [API] 응급실 (기존 로직 유지 + DB 좌표 매칭)
+# [API] 응급실 (DB 좌표 매칭)
 # ================================
 @app.route("/api/emergency")
 def get_emergency():
@@ -243,11 +233,9 @@ def get_emergency():
     result.sort(key=lambda x: (x["status"] == "불가", x["distance"]))
     return jsonify(result[:20])
 
+
 # ================================
-# [API] 약국 (기존 로직 유지)
-# ================================
-# ================================
-# [API] 약국 검색 (카카오 로컬 API 사용 - 정확도 100%)
+# [API] 약국 검색 (카카오 로컬 API 사용)
 # ================================
 @app.route("/api/pharmacy")
 def get_pharmacy():
@@ -304,7 +292,7 @@ def get_pharmacy():
     return jsonify(result)
 
 # ================================
-# [API] AI 챗봇 (기존 유지)
+# [API] AI 챗봇 
 # ================================
 @app.route("/api/chat", methods=["POST"])
 def chat_bot():
