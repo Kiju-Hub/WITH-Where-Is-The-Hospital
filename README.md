@@ -6,6 +6,10 @@
 ![Flask](https://img.shields.io/badge/Flask-2.0-000000?style=flat&logo=flask&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)
 
+
+
+![Main Screen](docs/WITH_basescreen.png)
+
 ## 🎥 시연 영상
 [▶️ 시연 영상 보러가기](https://youtu.be/ZxwgOmNNucE)
 
